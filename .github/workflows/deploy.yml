@@ -28,7 +28,7 @@ jobs:
       working-directory: hello-world  # Change this to your Vue.js project directory
 
     - name: Set up Gradle
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/gradle-build-action@v3
       with:
         gradle-version: '7.4'  # Change to your required Gradle version
 
@@ -42,7 +42,7 @@ jobs:
       working-directory: gradle-project
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: war-file
         path: gradle-project/build/libs/*.war
@@ -53,7 +53,7 @@ jobs:
 
     steps:
     - name: Download artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: war-file
         path: ./build/libs
