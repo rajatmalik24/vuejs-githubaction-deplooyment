@@ -20,6 +20,12 @@ task copyFrontend(type: Copy) {
     into "$buildDir/webapp"
 }
 
+task copyWebapp(type: Copy) {
+    from 'src/main/webapp'
+    into 'build/webapp'
+    duplicatesStrategy = DuplicatesStrategy.FAIL // Set the duplicates handling strategy here
+}
+
 war {
     dependsOn copyFrontend
     from "$buildDir/webapp"
@@ -36,13 +42,14 @@ repositories {
 }
 
 dependencies {
-    // This dependency is found on compile classpath of this component and consumers.
-    compile 'com.google.guava:guava:23.0'
+    // Dependency for compiling the application
+    implementation 'com.google.guava:guava:23.0'
 
-    // Use JUnit test framework
-    testCompile 'junit:junit:4.12'
+    // Dependency for testing the application
+    testImplementation 'junit:junit:4.12'
 }
 
 // Define the main class for the application
 mainClassName = 'App'
+
 
