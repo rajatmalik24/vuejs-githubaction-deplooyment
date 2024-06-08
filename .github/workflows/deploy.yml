@@ -64,7 +64,10 @@ jobs:
         with:
           name: war-file
           path: ./build/libs
-
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.AWS_SSH_KEY }}
       - name: Copy WAR to EC2
         env:
           KEY: ${{ secrets.AWS_SSH_KEY }}
