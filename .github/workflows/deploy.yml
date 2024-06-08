@@ -27,10 +27,13 @@ jobs:
         run: npm run build
         working-directory: hello-world
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v1
-        with:
-          gradle-version: '7.4'
+      - name: Download and set up Gradle
+        run: |
+          wget https://services.gradle.org/distributions/gradle-7.4-bin.zip
+          sudo mkdir /opt/gradle
+          sudo unzip -d /opt/gradle gradle-7.4-bin.zip
+          export PATH=$PATH:/opt/gradle/gradle-7.4/bin
+          gradle --version
 
       - name: Copy Vue.js build to Gradle project
         run: |
