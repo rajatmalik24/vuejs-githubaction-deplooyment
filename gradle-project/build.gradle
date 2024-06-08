@@ -54,8 +54,3 @@ dependencies {
 
 // Define the main class for the application
 mainClassName = 'App'
-<<<<<<< HEAD
-=======
-
-
->>>>>>> a9fc0ec02c2482dbdacabe80afa67c7fab02ce56
