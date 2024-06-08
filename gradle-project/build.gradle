@@ -26,7 +26,10 @@ war {
     webInf {
         from 'src/main/webapp/WEB-INF'
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // or DuplicatesStrategy.OVERWRITE, depending on your needs
 }
+
+
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -36,13 +39,12 @@ repositories {
 }
 
 dependencies {
-    // This dependency is found on compile classpath of this component and consumers.
-    compile 'com.google.guava:guava:23.0'
+    // Dependency for compiling the application
+    implementation 'com.google.guava:guava:23.0'
 
-    // Use JUnit test framework
-    testCompile 'junit:junit:4.12'
+    // Dependency for testing the application
+    testImplementation 'junit:junit:4.12'
 }
 
 // Define the main class for the application
 mainClassName = 'App'
-
