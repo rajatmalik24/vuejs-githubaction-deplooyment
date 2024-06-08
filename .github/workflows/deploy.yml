@@ -71,7 +71,7 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}
           USER: ${{ secrets.EC2_USER }}
         run: |
-          scp -i "$KEY" -o StrictHostKeyChecking=no ./build/libs/*.war $USER@$HOST:/path/to/deploy
+          scp -i "$KEY" -o StrictHostKeyChecking=no ./build/libs/*.war $USER@$HOST:/var/lib/tomcat10/webapps/HelloRajat
 
       - name: Deploy WAR on EC2
         env:
