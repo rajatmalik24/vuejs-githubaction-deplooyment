@@ -16,7 +16,7 @@ apply plugin: 'war'
 
 
 task copyFrontend(type: Copy) {
-    from '/home/ubuntu/hello-world/dist'
+    from 'hello-world/dist'
     into "$buildDir/webapp"
 }
 
