@@ -27,10 +27,16 @@ hello-world/dist
 /build
 .gradle-build-action
 
+# Allow Gradle wrapper files
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!gradlew
+!gradlew.bat
+
 # Java
 *.class
 *.jar
-*.war
+!*.war  # Allow WAR files for deployment
 *.ear
 
 # IntelliJ
@@ -50,4 +56,3 @@ nbdist/
 # VS Code
 .vscode/
 *.code-workspace
-
