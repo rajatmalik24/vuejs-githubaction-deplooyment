@@ -44,7 +44,7 @@ jobs:
       - name: Build WAR file
         run: |
           cd gradle-project
-          ./gradlew build
+          ./gradle build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
