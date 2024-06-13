@@ -1,19 +1,87 @@
-name: Create Directory on EC2 via AWS SSM
+Working One:
+
+name: Build and Deploy
 
 on:
   push:
     branches:
-      - main  # Replace with your branch name
-  workflow_dispatch:  # Allows manual triggering from  UI
+      - main
+  workflow_dispatch:
 
 jobs:
-  create-directory:
+  build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-        
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: hello-world
+
+      - name: Build Vue.js project
+        run: npm run build
+        working-directory: hello-world
+
+      - name: Upload dist files to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-south-1
+        run: |
+          aws s3 cp ./hello-world/dist s3://rajat-github-actions/HelloWorld --recursive
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: '7.4'
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+          build-scan-terms-of-use-agree: "yes"
+
+      - name: Ensure Gradle Wrapper is Executable
+        run: chmod +x gradle-project/gradlew
+
+      - name: Copy Vue.js build to Gradle project
+        run: |
+          mkdir -p gradle-project/src/main/webapp
+          cp -r hello-world/dist/* gradle-project/src/main/webapp/
+
+      - name: Build WAR file
+        run: |
+          cd gradle-project
+          ./gradlew build --debug
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: war-file
+          path: gradle-project/build/libs/*.war
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: war-file
+          path: ./build/libs
+      - name: Upload war files to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-south-1
+        run: |
+          aws s3 cp ./build/libs/*.war s3://xfitconnecttest-github/HelloWorld --recursive
+
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -29,15 +97,5 @@ jobs:
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --parameters commands="mkdir -p $DIRECTORY_PATH" \
+            --parameters commands="aws s3 cp s3://xfitconnecttest-github/HelloWorld/*.war /home/rajat/test/" \
             --output text
-      
-      - name: Monitor command execution
-        run: |
-          INSTANCE_ID="i-02cc9441f4af091be"
-          echo "Instance ID: ${{ github.event.inputs.instance-id }}"
-          # Check command execution status and output
-          aws ssm list-command-invocations --details \
-            --instance-id "$INSTANCE_ID" \
-            --query "CommandInvocations[?Status=='Success'].{ID:CommandId, Status:Status, Output:CommandPlugins[].Output}" \
-            --output json
