@@ -23,7 +23,7 @@ jobs:
       
       - name: Run AWS SSM command to create directory
         run: |
-          INSTANCE_ID="your-instance-id"  # Replace with your EC2 instance ID
+          INSTANCE_ID="i-02cc9441f4af091be"  # Replace with your EC2 instance ID
           DIRECTORY_PATH="/home/rajat/test"
           
           aws ssm send-command \
