@@ -79,7 +79,8 @@ jobs:
           AWS_DEFAULT_REGION: ap-south-1
         run: |
           ls -al ./build/libs/
-          aws s3 cp ./build/libs/*.war s3://xfitconnecttest-github/HelloWorld --recursive
+          cd ./build/libs/
+          aws s3 cp *.war s3://xfitconnecttest-github/HelloWorld/ --recursive
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
