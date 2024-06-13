@@ -80,7 +80,7 @@ jobs:
         run: |
           ls -al ./build/libs/
           cd ./build/libs/
-          aws s3 cp *.war s3://xfitconnecttest-github/HelloWorld/ --recursive
+          aws s3 cp *.war s3://xfitconnecttest-github/HelloWorld/
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
