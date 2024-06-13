@@ -78,6 +78,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-south-1
         run: |
+          ls -al ./build/libs/
           aws s3 cp ./build/libs/*.war s3://xfitconnecttest-github/HelloWorld --recursive
 
       - name: Set up AWS CLI
@@ -86,14 +87,3 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
-      
-      - name: Run AWS SSM command to create directory
-        run: |
-          INSTANCE_ID="i-02cc9441f4af091be"  # Replace with your EC2 instance ID
-          DIRECTORY_PATH="/home/rajat/test"
-          
-          aws ssm send-command \
-            --instance-ids "$INSTANCE_ID" \
-            --document-name "AWS-RunShellScript" \
-            --parameters commands="aws s3 cp s3://xfitconnecttest-github/HelloWorld/*.war /home/rajat/test/" \
-            --output text
