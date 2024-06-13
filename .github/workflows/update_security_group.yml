@@ -33,7 +33,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-south-1
         run: |
-          aws s3 cp ./hello-world/dist s3://rajat-github-actions/HelloWorld --recursive
+          aws s3 cp ./hello-world/dist s3://xfitconnecttest-github/HelloWorld --recursive
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
