@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main  # Replace with your branch name
-  workflow_dispatch:  # Allows manual triggering from GitHub UI
+  workflow_dispatch:  # Allows manual triggering from  UI
 
 jobs:
   create-directory:
