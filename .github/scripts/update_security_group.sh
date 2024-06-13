@@ -14,8 +14,12 @@ IPS=$(curl -s https://api.github.com/meta | jq -r '.actions[]')
 echo "Fetched IP addresses:" >&2
 echo "$IPS" >&2
 
-# Convert IP addresses to aggregated CIDR blocks
-CIDR_BLOCKS=$(echo "$IPS" | xargs -n1 ipcalc -n | sort -u)
+# Aggregate IP addresses into CIDR blocks
+CIDR_BLOCKS=$(echo "$IPS" | awk -F '.' '{print $1"."$2"."$3".0/24"}' | sort -u)
+
+# Example of debugging output
+echo "CIDR blocks to authorize:" >&2
+echo "$CIDR_BLOCKS" >&2
 
 # Revoke old rules (optional but recommended to avoid duplicate rules)
 OLD_IPS=$(aws ec2 describe-security-groups --group-id $SECURITY_GROUP_ID --query "SecurityGroups[0].IpPermissions[?FromPort==\`$PORT\`].IpRanges[*].CidrIp" --output text)
