@@ -7,13 +7,16 @@ PORT="22"  # e.g., 22 for SSH, 80 for HTTP
 # Fetch the latest GitHub Actions IP addresses
 IPS=$(curl -s https://api.github.com/meta | jq -r '.actions[]')
 
+# Convert IP addresses to aggregated CIDR blocks
+CIDR_BLOCKS=$(echo "$IPS" | xargs -n1 ipcalc -n | sort -u)
+
 # Revoke old rules (optional but recommended to avoid duplicate rules)
 OLD_IPS=$(aws ec2 describe-security-groups --group-id $SECURITY_GROUP_ID --query "SecurityGroups[0].IpPermissions[?FromPort==\`$PORT\`].IpRanges[*].CidrIp" --output text)
 for OLD_IP in $OLD_IPS; do
   aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port $PORT --cidr $OLD_IP
 done
 
-# Add new rules
-for IP in $IPS; do
-  aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port $PORT --cidr $IP
+# Add new rules for aggregated CIDR blocks
+for CIDR in $CIDR_BLOCKS; do
+  aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port $PORT --cidr $CIDR
 done
