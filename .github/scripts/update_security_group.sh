@@ -1,36 +1,41 @@
-#!/bin/bash
+name: Create Directory on EC2 via AWS SSM
 
-# Example of logging to stderr for troubleshooting
-echo "Starting update_security_group.sh at $(date)" >&2
+on:
+  push:
+    branches:
+      - main  # Replace with your branch name
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
 
-# Define variables
-SECURITY_GROUP_ID="sg-0fce1b8d8e4ee7141"
-PORT="22"  # e.g., 22 for SSH, 80 for HTTP
-
-# Fetch the latest GitHub Actions IP addresses
-IPS=$(curl -s https://api.github.com/meta | jq -r '.actions[]')
-
-# Example of debugging output
-echo "Fetched IP addresses:" >&2
-echo "$IPS" >&2
-
-# Aggregate IP addresses into CIDR blocks
-CIDR_BLOCKS=$(echo "$IPS" | awk -F '.' '{print $1"."$2"."$3".0/24"}' | sort -u)
-echo $CIDR_BLOCKS
-echo rajat
-# Example of debugging output
-echo "CIDR blocks to authorize:" >&2
-echo "$CIDR_BLOCKS" >&2
-
-# Revoke old rules (optional but recommended to avoid duplicate rules)
-OLD_IPS=$(aws ec2 describe-security-groups --group-id $SECURITY_GROUP_ID --query "SecurityGroups[0].IpPermissions[?FromPort==\`$PORT\`].IpRanges[*].CidrIp" --output text)
-for OLD_IP in $OLD_IPS; do
-  aws ec2 revoke-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port $PORT --cidr $OLD_IP >&2
-done
-
-# Add new rules for aggregated CIDR blocks
-for CIDR in $CIDR_BLOCKS; do
-  aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port $PORT --cidr $CIDR >&2
-done
-
-echo "Finished update_security_group.sh at $(date)" >&2
+jobs:
+  create-directory:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: your-aws-region
+      
+      - name: Run AWS SSM command to create directory
+        run: |
+          INSTANCE_ID="your-instance-id"  # Replace with your EC2 instance ID
+          DIRECTORY_PATH="/home/rajat/test"
+          
+          aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands="mkdir -p $DIRECTORY_PATH" \
+            --output text
+      
+      - name: Monitor command execution
+        run: |
+          # Check command execution status and output
+          aws ssm list-command-invocations --details \
+            --instance-id "$INSTANCE_ID" \
+            --query "CommandInvocations[?Status=='Success'].{ID:CommandId, Status:Status, Output:CommandPlugins[].Output}" \
+            --output json
