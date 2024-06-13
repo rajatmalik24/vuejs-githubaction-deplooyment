@@ -34,6 +34,7 @@ jobs:
       
       - name: Monitor command execution
         run: |
+          echo "Instance ID: ${{ github.event.inputs.instance-id }}"
           # Check command execution status and output
           aws ssm list-command-invocations --details \
             --instance-id "$INSTANCE_ID" \
