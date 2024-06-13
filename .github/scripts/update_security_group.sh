@@ -16,7 +16,8 @@ echo "$IPS" >&2
 
 # Aggregate IP addresses into CIDR blocks
 CIDR_BLOCKS=$(echo "$IPS" | awk -F '.' '{print $1"."$2"."$3".0/24"}' | sort -u)
-
+echo $CIDR_BLOCKS
+echo rajat
 # Example of debugging output
 echo "CIDR blocks to authorize:" >&2
 echo "$CIDR_BLOCKS" >&2
