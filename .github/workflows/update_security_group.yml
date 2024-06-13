@@ -81,14 +81,7 @@ jobs:
           ls -al ./build/libs/
           cd ./build/libs/
           aws s3 cp *.war s3://xfitconnecttest-github/HelloWorld/
-
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-      
+    
       - name: Run AWS SSM command to create directory
         run: |
           INSTANCE_ID="i-02cc9441f4af091be"  # Replace with your EC2 instance ID
@@ -97,5 +90,5 @@ jobs:
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --parameters commands="aws s3 cp s3://xfitconnecttest-github/HelloWorld/*.war /home/rajat/test/" \
+            --parameters commands="aws s3 cp s3://xfitconnecttest-github/HelloWorld/gradle-project.war /home/rajat/test/" \
             --output text
